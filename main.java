@@ -2,9 +2,10 @@ import java.util.ArrayList;
 
 class Main {
   public static void main(String[] args) {
-    
+    FlightDatabase database = new FlightDatabase();
+    /*
     // START - checking if the flight exists
-    FlightDatabase database = new FlightDatabase(); 
+     
     boolean yesOrNo = database.checkIfFlightExists("Los Angeles", "Shanghai");
     // END - checking if the flight exists
 
@@ -35,6 +36,19 @@ class Main {
     System.out.println("this is the cheapest flight from this city:");
     theCheapestFromCity.info();
     // END - getting  cheapest flight from city
+    */
+
+    // START - connecting flight
+    ArrayList<Journey> connectingFlight = database.getFlights("Warsaw", "Bangkok");
+    if(connectingFlight.isEmpty()){
+      System.out.println("This flight doesn't exist!");
+    }
+    else{
+      for(Journey j:connectingFlight){
+      j.info();
+      }
+    }
+    // END - connecting flight
   }
 }
 
@@ -59,7 +73,7 @@ class FlightDatabase {
 
   // Helper method to generate a random city
     public String generateRandomCity() {
-        String[] cities = {"Amsterdam", "Paris", "Rome", "Tokyo", "Sydney", "New York", "London", "Berlin", "Bangkok", "Moscow", "Las Vegas", "Barcelona", "Dubai", "Cairo"};
+        String[] cities = {"Amsterdam", "Paris", "Rome", "Tokyo", "Sydney", "New York", "London", "Berlin", "Bangkok", "Moscow", "Las Vegas", "Barcelona", "Dubai", "Cairo", "Warsaw"};
         int randomIndex = (int) (Math.random() * cities.length);
         return cities[randomIndex];
     }
@@ -164,5 +178,33 @@ class FlightDatabase {
       }
     }
     return cheapestFlight;
+  }
+  public ArrayList<Journey> getFlights(String start, String end){
+    
+    ArrayList<Flight> starting = getFlightsFromCity(start);
+    ArrayList<Flight> ending = getFlightsToCity(end);
+    ArrayList<Journey> results = new ArrayList<Journey>();
+    for (Flight first:starting){
+      for (Flight second:ending){
+        if (first.arrival.equals(second.departure)){
+          results.add(new Journey(first,second));
+        }
+      }
+    }
+    return results;
+  }
+}
+class Journey {
+  Flight firstFlight;
+  Flight secondFlight;
+
+  public Journey (Flight firstFlight, Flight secondFlight){
+    this.firstFlight = firstFlight;
+    this.secondFlight = secondFlight;
+  }
+  public void info() {
+    System.out.println("Flight from " + firstFlight.departure + " to " + firstFlight.arrival + " costs " + firstFlight.price);
+    System.out.println("Flight from " + secondFlight.departure + " to " + secondFlight.arrival + " costs " + secondFlight.price);
+        System.out.println("The whole journey will cost you " + (firstFlight.price + secondFlight.price));
   }
 }
